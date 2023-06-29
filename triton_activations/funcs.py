@@ -4,6 +4,7 @@ import torch
 import triton
 import triton.language as tl
 
+
 @triton.jit
 def tanh_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constexpr):
     """
@@ -19,19 +20,12 @@ def tanh_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constex
     tl.store(output_ptr + offsets, output, mask=mask)
 
 
-def tanh_activation(x: torch.Tensor):
-    output = torch.empty_like(x)
-    assert x.is_cuda and output.is_cuda
-    n_elements = output.numel()
-    grid = lambda meta: (triton.cdiv(n_elements, meta['BLOCK_SIZE']),)
-    tanh_activation_kernel[grid](x, output, n_elements, BLOCK_SIZE=1024)
-    return output
-
-
 @triton.jit
 def relu_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constexpr):
     """
     ReLU activation function kernel
+
+    Computes the element-wise function: {relu}(x) = \max(x, 0)
     """
     pid = tl.program_id(axis=0)
     block_start = pid * BLOCK_SIZE
@@ -43,19 +37,12 @@ def relu_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constex
     tl.store(output_ptr + offsets, output, mask=mask)
 
 
-def relu_activation(x: torch.Tensor):
-    output = torch.empty_like(x)
-    assert x.is_cuda and output.is_cuda
-    n_elements = output.numel()
-    grid = lambda meta: (triton.cdiv(n_elements, meta['BLOCK_SIZE']),)
-    relu_activation_kernel[grid](x, output, n_elements, BLOCK_SIZE=1024)
-    return output
-
-
 @triton.jit
 def softplus_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constexpr):
     """
     Softplus activation function kernel
+
+    Computes the element-wise function: {softplus}(x) = \log(1 + e^x)
     """
     pid = tl.program_id(axis=0)
     block_start = pid * BLOCK_SIZE
@@ -67,45 +54,100 @@ def softplus_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.con
     tl.store(output_ptr + offsets, output, mask=mask)
 
 
-def softplus_activation(x: torch.Tensor):
-    output = torch.empty_like(x)
-    assert x.is_cuda and output.is_cuda
-    n_elements = output.numel()
-    grid = lambda meta: (triton.cdiv(n_elements, meta['BLOCK_SIZE']),)
-    softplus_activation_kernel[grid](x, output, n_elements, BLOCK_SIZE=1024)
-    return output
+@triton.jit
+def softsign_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constexpr):
+    """
+    Softsign activation function kernel
+
+    Computes the element-wise function: {soft\_sign}(x) = \frac{x}{|x| + 1}
+    """
+    pid = tl.program_id(axis=0)
+    block_start = pid * BLOCK_SIZE
+    offsets = block_start + tl.arange(0, BLOCK_SIZE)
+    mask = offsets < n_elements
+
+    x = tl.load(x_ptr + offsets, mask=mask)
+    output = x / (tl.libdevice.abs(x) + 1)
+    tl.store(output_ptr + offsets, output, mask=mask)
 
 
-torch.manual_seed(0)
-size = 98432
+@triton.jit
+def sigmoid_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constexpr):
+    """
+    Sigmoid activation function kernel
 
-# Tanh
-start_time = time.time()
-output_triton_tanh = tanh_activation(x)
-end_time = time.time()
-triton_execution_time_tanh = end_time - start_time
+    Computes the element-wise function: {sigmoid}(x) = \frac{1}{1 + e^{-x}}
+    """
+    pid = tl.program_id(axis=0)
+    block_start = pid * BLOCK_SIZE
+    offsets = block_start + tl.arange(0, BLOCK_SIZE)
+    mask = offsets < n_elements
 
-# ReLU
-start_time = time.time()
-output_triton_relu = relu_activation(x)
-end_time = time.time()
-triton_execution_time_relu = end_time - start_time
+    x = tl.load(x_ptr + offsets, mask=mask)
+    output = 1 / (1 + tl.exp(-x))
+    tl.store(output_ptr + offsets, output, mask=mask)
 
-# Softplus
-start_time = time.time()
-output_triton_softplus= softplus_activation(x)
-end_time = time.time()
-triton_execution_time_softplus = end_time - start_time
 
-print(f'Output triton (Tanh): {output_triton_tanh}\n')
-print(f'Triton execution time (Tanh): {triton_execution_time_tanh} seconds\n')
+@triton.jit
+def silu_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constexpr):
+    """
+    SiLU activation function kernel
 
-print("---------------")
+    Computes the element-wise function: {silu}(x) = x \cdot \mathrm{sigmoid}(x) = \frac{x}{1 + e^{-x}}
+    """
+    pid = tl.program_id(axis=0)
+    block_start = pid * BLOCK_SIZE
+    offsets = block_start + tl.arange(0, BLOCK_SIZE)
+    mask = offsets < n_elements
 
-print(f'Output triton (ReLU): {output_triton_relu}\n')
-print(f'Triton execution time (ReLU): {triton_execution_time_relu} seconds\n')
+    x = tl.load(x_ptr + offsets, mask=mask)
+    output = x * (1 / (1 + tl.exp(-x)))
+    tl.store(output_ptr + offsets, output, mask=mask)
 
-print("---------------")
 
-print(f'Output triton (Softplus): {output_triton_softplus}\n')
-print(f'Triton execution time (Softplus): {triton_execution_time_softplus} seconds\n')
+@triton.jit
+def gelu_activation_kernel(x_ptr, output_ptr, approximation, n_elements, BLOCK_SIZE: tl.constexpr):
+    """
+    GeLU activation function kernel
+
+    Computes the element-wise function: {gelu}(x) = \frac{x}{2} \left(1 + \mathrm{erf} \left(\frac{x}{\sqrt{2}} \right) \right)
+
+    If ``approximate=True``, uses the approximate formulation of GELU:
+
+    Computes the approximate formulation of GeLU: {gelu}(x) = \frac{x}{2} \left(1 + \mathrm{tanh} \left( \sqrt{\frac{2}{\pi}} \left(x + 0.044715 x^3 \right) \right) \right)
+
+    """
+    pid = tl.program_id(axis=0)
+    block_start = pid * BLOCK_SIZE
+    offsets = block_start + tl.arange(0, BLOCK_SIZE)
+    mask = offsets < n_elements
+
+    x = tl.load(x_ptr + offsets, mask=mask)
+    if approximation == True:
+
+        output = 0.5 * x * (1 + tf.libdevice.tanh(math.sqrt(2.0 / math.pi) * (x + 0.044715 * x * x * x)))
+        tl.store(output_ptr + offsets, output, mask=mask)
+    else:
+        output = x * 0.5 * (1.0 + tl.libdevice.erf(x / math.sqrt(2.0)))
+        tl.store(output_ptr + offsets, output, mask=mask)
+
+
+@triton.jit
+def softmax_activation_kernel(x_ptr, output_ptr, axis_ld, n_elements, BLOCK_SIZE: tl.constexpr):
+    """
+    Softmax activation function kernel
+
+    Computes the function which rescales elements to the range`[0, 1]`: {softmax}(x) = \frac{\exp(x_i)}{\sum_j \exp(x_j)}
+    """
+    pid = tl.program_id(axis=0)
+    block_start = pid * BLOCK_SIZE
+    offsets = block_start + tl.arange(0, BLOCK_SIZE)
+    mask = offsets < n_elements
+
+    x = tl.load(x_ptr + offsets, mask=mask)
+    max_x = tl.libdevice.max(x, axis_ld)
+    x -= max_x
+    exp_x = tl.libdevice.exp(x)
+    sum_exp_x = tl.sum(exp_x, axis_ld)
+    output = exp_x / sum_exp_x
+    tl.store(output_ptr + offsets, output, mask=mask)
