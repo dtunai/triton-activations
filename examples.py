@@ -22,7 +22,7 @@ triton_execution_time_relu = end_time - start_time
 
 # ReLU 6
 start_time = time.time()
-output_triton_relu = activations.relu6_activation(x)
+output_triton_relu6 = activations.relu6_activation(x)
 end_time = time.time()
 triton_execution_time_relu6 = end_time - start_time
 
@@ -78,7 +78,7 @@ print(f"Triton execution time (ReLU): {triton_execution_time_relu} seconds\n")
 
 print("---------------")
 
-print(f"Output triton (ReLU): {output_triton_relu6}\n")
+print(f"Output triton (ReLU 6): {output_triton_relu6}\n")
 print(f"Triton execution time (ReLU): {triton_execution_time_relu6} seconds\n")
 
 print("---------------")
@@ -93,14 +93,14 @@ print(f"Triton execution time (Softsign): {triton_execution_time_softsign} secon
 
 print("---------------")
 
-print(f"Output triton (Softsign): {output_triton_sigmoid}\n")
-print(f"Triton execution time (Softsign): {triton_execution_time_sigmoid} seconds\n")
+print(f"Output triton (Sigmoid): {output_triton_sigmoid}\n")
+print(f"Triton execution time (Sigmoid): {triton_execution_time_sigmoid} seconds\n")
 
 print("---------------")
 
-print(f"Output triton (Softsign): {output_triton_hard_sigmoid}\n")
+print(f"Output triton (Hard Sigmoid): {output_triton_hard_sigmoid}\n")
 print(
-    f"Triton execution time (Softsign): {triton_execution_time_hard_sigmoid} seconds\n"
+    f"Triton execution time (Hard Sigmoid): {triton_execution_time_hard_sigmoid} seconds\n"
 )
 
 print("---------------")
