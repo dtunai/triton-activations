@@ -48,7 +48,7 @@ def leaky_relu_activation(x: torch.Tensor, alpha: float = 0.2):
     """
     Applies the LeakyReLU activation function element-wise to the input tensor
     """
-    return apply_activation(x, leaky_relu_activation_kernel, alpha=alpha)
+    return apply_activation(x, functions.leaky_relu_activation, alpha=alpha)
 
 
 def softplus_activation(x: torch.Tensor):
