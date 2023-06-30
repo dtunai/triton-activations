@@ -124,11 +124,10 @@ def gelu_activation_kernel(x_ptr, output_ptr, approximation, n_elements, BLOCK_S
 
     x = tl.load(x_ptr + offsets, mask=mask)
     if approximation == True:
-
-        output = 0.5 * x * (1 + tf.libdevice.tanh(math.sqrt(2.0 / math.pi) * (x + 0.044715 * x * x * x)))
+        output = 0.5 * x * (1 + tl.libdevice.tanh(tl.libdevice.sqrt(2.0 / 3.141592653589793) * (x + 0.044715 * x * x * x)))
         tl.store(output_ptr + offsets, output, mask=mask)
     else:
-        output = x * 0.5 * (1.0 + tl.libdevice.erf(x / math.sqrt(2.0)))
+        output = x * 0.5 * (1.0 + tl.libdevice.erf(x / tl.libdevice.sqrt(2.0)))
         tl.store(output_ptr + offsets, output, mask=mask)
 
 
@@ -148,6 +147,6 @@ def softmax_activation_kernel(x_ptr, output_ptr, axis_ld, n_elements, BLOCK_SIZE
     max_x = tl.libdevice.max(x, axis_ld)
     x -= max_x
     exp_x = tl.libdevice.exp(x)
-    sum_exp_x = tl.sum(exp_x, axis_ld)
+    sum_exp_x = exp_x + axis_ld
     output = exp_x / sum_exp_x
     tl.store(output_ptr + offsets, output, mask=mask)
