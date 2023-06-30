@@ -55,6 +55,25 @@ def relu6_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.conste
 
 
 @triton.jit
+def leaky_relu_activation_kernel(
+    x_ptr, output_ptr, n_elements, alpha, BLOCK_SIZE: tl.constexpr
+):
+    """
+    Leaky ReLU activation function kernel
+
+    Computes the element-wise function: {leaky_relu}(x) = \max(x, \alpha * x) with a given alpha slope value
+    """
+    pid = tl.program_id(axis=0)
+    block_start = pid * BLOCK_SIZE
+    offsets = block_start + tl.arange(0, BLOCK_SIZE)
+    mask = offsets < n_elements
+
+    x = tl.load(x_ptr + offsets, mask=mask)
+    output = tl.maximum(x, alpha * x)
+    tl.store(output_ptr + offsets, output, mask=mask)
+
+
+@triton.jit
 def softplus_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constexpr):
     """
     Softplus activation function kernel
