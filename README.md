@@ -2,6 +2,15 @@
 
 Expanded collection of Neural Network Activation Functions and Other Function Kernels in Triton Language (Triton Compiler).
 
+## Usage
+
+```bash
+git clone github.com/simuark/triton-activations
+cd triton-activations
+python3 setup.py install
+python3 examples.py
+```
+
 ## List of the activation functions in Triton Activations
 
 #### **Hyperbolic Tangent Activation Function Kernel**
