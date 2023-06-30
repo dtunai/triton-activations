@@ -11,12 +11,12 @@ with open("requirements.txt", "r") as requirements_file:
 setup(
     name="triton-activations",
     version=VERSION,
-    description="A expanded collection of NN activations for Triton Compiler",
+    description="A expanded collection of Neural Network activations and other functions for Triton Compiler",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="simuark",
     author_email="simuarc@gmail.com",
-    url="https://github.com/your_username/triton_activations",
+    url="https://github.com/simuark/triton_activations",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 1 - Alpha",
