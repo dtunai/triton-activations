@@ -16,7 +16,7 @@ Uses the rectified linear unit (ReLU) activation function to process input data.
 
 Similar to the Rectified Linear Unit (ReLU) kernel, this kernel also uses the ReLU activation function. However, it additionally clips the output values at 6, limiting them to the range [0, 6].
 
-#### Leaky ReLU Activation Function Kernel
+#### **Leaky ReLU Activation Function Kernel**
 Computes the element-wise function leaky_relu(x) = max(x, alpha * x), where x is the input tensor and alpha is a given slope parameter.
 
 #### **Softplus Activation Function Kernel**
