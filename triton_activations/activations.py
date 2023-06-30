@@ -6,7 +6,7 @@ from typing import Any, Optional, Union
 
 def apply_activation(x: torch.Tensor, activation_fn: Any, *args, **kwargs):
     """
-    applies the specified activation function element-wise to the input tensor
+    Applies the specified activation function element-wise to the input tensor
     """
     output = torch.empty_like(x)
     assert x.is_cuda and output.is_cuda
@@ -27,43 +27,55 @@ def tanh_activation(x: torch.Tensor):
 
 def relu_activation(x: torch.Tensor):
     """
-    applies the rectified linear unit (ReLU) activation function element-wise to the input tensor
+    Applies the rectified linear unit (ReLU) activation function element-wise to the input tensor
     """
     return apply_activation(x, functions.relu_activation_kernel)
 
+def relu6_activation(x: torch.Tensor):
+    """
+    Applies the rectified linear unit 6 (ReLU 6) activation function element-wise to the input tensor
+    """
+    return apply_activation(x, functions.relu6_activation_kernel)
+
 def softplus_activation(x: torch.Tensor):
     """
-    applies the softplus activation function element-wise to the input tensor
+    Applies the softplus activation function element-wise to the input tensor
     """
     return apply_activation(x, functions.softplus_activation_kernel)
 
 def softsign_activation(x: torch.Tensor):
     """
-    applies the softsign activation function element-wise to the input tensor
+    Applies the softsign activation function element-wise to the input tensor
     """
     return apply_activation(x, functions.softsign_activation_kernel)
 
 def sigmoid_activation(x: torch.Tensor):
     """
-    applies the sigmoid activation function element-wise to the input tensor
+    Applies the sigmoid activation function element-wise to the input tensor
     """
     return apply_activation(x, functions.sigmoid_activation_kernel)
 
+def hard_sigmoid_activation(x: torch.Tensor):
+    """
+    Applies the hard sigmoid activation function element-wise to the input tensor
+    """
+    return apply_activation(x, functions.hard_sigmoid_activation_kernel)
+
 def silu_activation(x: torch.Tensor):
     """
-    applies the Sigmoid-weighted Linear Unit (SiLU) activation function element-wise to the input tensor
+    Applies the Sigmoid-weighted Linear Unit (SiLU) activation function element-wise to the input tensor
     """
     return apply_activation(x, functions.silu_activation_kernel)
 
 def gelu_activation(x: torch.Tensor, approximate: bool = True):
     """
-    applies the Gaussian Error Linear Unit (GELU) activation function element-wise to the input tensor
+    Applies the Gaussian Error Linear Unit (GELU) activation function element-wise to the input tensor
     """
     return apply_activation(x, functions.gelu_activation_kernel, approximate)
 
 def softmax_activation(x: torch.Tensor, axis_ld: Optional[Union[int, tuple[int, ...]]] = -1):
     """
-    applies the softmax activation function to the input tensor along the specified axis
+    Applies the softmax activation function to the input tensor along the specified axis
     """
     if axis_ld is None:
         axis_ld = 0

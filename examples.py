@@ -3,7 +3,7 @@ import torch
 from triton_activations import activations
 from typing import Any, Optional, Union
 
-# create rand array for example usages
+# Create rand array for example usages
 torch.manual_seed(0)
 size = 98432
 x = torch.rand(size, device='cuda')
@@ -20,6 +20,12 @@ output_triton_relu = activations.relu_activation(x)
 end_time = time.time()
 triton_execution_time_relu = end_time - start_time
 
+# ReLU 6
+start_time = time.time()
+output_triton_relu = activations.relu6_activation(x)
+end_time = time.time()
+triton_execution_time_relu6 = end_time - start_time
+
 # Softplus
 start_time = time.time()
 output_triton_softplus = activations.softplus_activation(x)
@@ -31,6 +37,18 @@ start_time = time.time()
 output_triton_softsign = activations.softsign_activation(x)
 end_time = time.time()
 triton_execution_time_softsign = end_time - start_time
+
+# Sigmoid
+start_time = time.time()
+output_triton_sigmoid = activations.sigmoid_activation(x)
+end_time = time.time()
+triton_execution_time_sigmoid = end_time - start_time
+
+# Hard Sigmoid
+start_time = time.time()
+output_triton_hard_sigmoid = activations.hard_sigmoid_activation(x)
+end_time = time.time()
+triton_execution_time_hard_sigmoid = end_time - start_time
 
 # SiLU
 start_time = time.time()
@@ -60,6 +78,11 @@ print(f'Triton execution time (ReLU): {triton_execution_time_relu} seconds\n')
 
 print("---------------")
 
+print(f'Output triton (ReLU): {output_triton_relu6}\n')
+print(f'Triton execution time (ReLU): {triton_execution_time_relu6} seconds\n')
+
+print("---------------")
+
 print(f'Output triton (Softplus): {output_triton_softplus}\n')
 print(f'Triton execution time (Softplus): {triton_execution_time_softplus} seconds\n')
 
@@ -67,6 +90,16 @@ print("---------------")
 
 print(f'Output triton (Softsign): {output_triton_softsign}\n')
 print(f'Triton execution time (Softsign): {triton_execution_time_softsign} seconds\n')
+
+print("---------------")
+
+print(f'Output triton (Softsign): {output_triton_sigmoid}\n')
+print(f'Triton execution time (Softsign): {triton_execution_time_sigmoid} seconds\n')
+
+print("---------------")
+
+print(f'Output triton (Softsign): {output_triton_hard_sigmoid}\n')
+print(f'Triton execution time (Softsign): {triton_execution_time_hard_sigmoid} seconds\n')
 
 print("---------------")
 

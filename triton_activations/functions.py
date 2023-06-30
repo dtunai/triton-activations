@@ -36,6 +36,22 @@ def relu_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constex
     output = tl.maximum(0, x)
     tl.store(output_ptr + offsets, output, mask=mask)
 
+@triton.jit
+def relu6_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constexpr):
+    """
+    ReLU 6 activation function kernel
+
+    Computes the element-wise function: {relu6}(x) = \min(\max(x, 0), 6)
+    """
+    pid = tl.program_id(axis=0)
+    block_start = pid * BLOCK_SIZE
+    offsets = block_start + tl.arange(0, BLOCK_SIZE)
+    mask = offsets < n_elements
+
+    x = tl.load(x_ptr + offsets, mask=mask)
+    output = tl.libdevice.min(tl.libdevice.max(x, 0), 6.)
+    tl.store(output_ptr + offsets, output, mask=mask)
+
 
 @triton.jit
 def softplus_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constexpr):
@@ -85,6 +101,24 @@ def sigmoid_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.cons
 
     x = tl.load(x_ptr + offsets, mask=mask)
     output = 1 / (1 + tl.exp(-x))
+    tl.store(output_ptr + offsets, output, mask=mask)
+
+@triton.jit
+def hard_sigmoid_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constexpr):
+    """
+    Hard sigmoid activation function kernel
+
+    Computes the element-wise function: {hard\_sigmoid}(x) = \frac{\mathrm{relu6}(x + 3)}{6}
+    """
+    pid = tl.program_id(axis=0)
+    block_start = pid * BLOCK_SIZE
+    offsets = block_start + tl.arange(0, BLOCK_SIZE)
+    mask = offsets < n_elements
+
+    x = tl.load(x_ptr + offsets, mask=mask)
+    x_plus_3 = tl.libdevice.add(x, 3.)
+    relu6_result = tl.libdevice.min(tl.libdevice.max(x_plus_3, 0), 6.)
+    output = tl.libdevice.div(relu6_result, 6.)
     tl.store(output_ptr + offsets, output, mask=mask)
 
 
@@ -150,3 +184,4 @@ def softmax_activation_kernel(x_ptr, output_ptr, axis_ld, n_elements, BLOCK_SIZE
     sum_exp_x = exp_x + axis_ld
     output = exp_x / sum_exp_x
     tl.store(output_ptr + offsets, output, mask=mask)
+
