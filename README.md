@@ -1,6 +1,6 @@
 # Triton Activations
 
-Expanded collection of Neural Network activation functions and other function kernels in Triton Language (Triton Compiler).
+Expanded collection of Neural Network activation functions and other function kernels in [Triton by OpenAI.](https://github.com/openai/triton)
 
 ## Usage
 
