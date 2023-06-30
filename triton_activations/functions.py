@@ -120,9 +120,9 @@ def hard_sigmoid_activation_kernel(
     mask = offsets < n_elements
 
     x = tl.load(x_ptr + offsets, mask=mask)
-    x_plus_3 = tl.libdevice.add(x, 3.0)
+    x_plus_3 = x + 3.0
     relu6_result = tl.libdevice.min(tl.libdevice.max(x_plus_3, 0), 6.0)
-    output = tl.libdevice.div(relu6_result, 6.0)
+    output = relu6_result / 6.0
     tl.store(output_ptr + offsets, output, mask=mask)
 
 
