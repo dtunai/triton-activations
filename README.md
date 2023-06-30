@@ -1,2 +1,3 @@
-# triton-activations
-Extended collection of activation function kernels for Triton Language
+## Triton Activations
+
+Extended collection of activation function kernels for Triton Language or as known as Triton Compiler.
