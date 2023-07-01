@@ -21,6 +21,7 @@ x = torch.rand(size, device="cuda")
 # Activation functions dict object
 activation_functions = {
     "Tanh": activations.tanh_activation,
+    "Hard Tanh": activations.hard_tanh_activation,
     "ReLU": activations.relu_activation,
     "ReLU 6": activations.relu6_activation,
     "Leaky ReLU": lambda x: activations.leaky_relu_activation(x, alpha=0.2),

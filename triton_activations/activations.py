@@ -30,6 +30,13 @@ def tanh_activation(x: torch.Tensor):
     return apply_activation(x, functions.tanh_activation_kernel)
 
 
+def hard_tanh_activation(x: torch.Tensor):
+    """
+    Applies the hard tanh activation function element-wise to the input tensor
+    """
+    return apply_activation(x, functions.hard_tanh_activation_kernel)
+
+
 def relu_activation(x: torch.Tensor):
     """
     Applies the rectified linear unit (ReLU) activation function element-wise to the input tensor

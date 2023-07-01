@@ -17,6 +17,10 @@ python3 examples.py
 
 Applies the hyperbolic tangent activation function to transform input data. It squashes the input values to the range [-1, 1], providing non-linear behavior with outputs centered around zero.
 
+#### **Hard Tanh Activation Function Kernel**
+
+Applies the hard tanh activation function to transform input data. It is a piecewise linear approximation of the hyperbolic tangent function and maps input values to the range [-1, 1]. Unlike the hyperbolic tangent function, the hard tanh function has a flat region where the output saturates, resulting in a thresholding effect. 
+
 #### **Rectified Linear Unit Activation Function Kernel**
 
 Uses the rectified linear unit (ReLU) activation function to process input data. It sets negative values to zero while passing positive values unchanged, resulting in a piecewise linear activation function.

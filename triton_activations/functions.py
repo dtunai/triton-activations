@@ -21,6 +21,27 @@ def tanh_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constex
 
 
 @triton.jit
+def hard_tanh_activation_kernel(
+    x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constexpr
+):
+    """
+    Hard Tanh activation function kernel
+
+    Computes the element-wise function: hard\_tanh}(x) = -1, & x < -1\\x, & -1 \le x \le 1\\1, & 1 < x
+    """
+
+    pid = tl.program_id(axis=0)
+    block_start = pid * BLOCK_SIZE
+    offsets = block_start + tl.arange(0, BLOCK_SIZE)
+    mask = offsets < n_elements
+
+    x = tl.load(x_ptr + offsets, mask=mask)
+    shape_condition = tl.where(x < -1, -1, x)
+    output = tl.where(x > 1, 1, shape_condition)
+    tl.store(output_ptr + offsets, output, mask=mask)
+
+
+@triton.jit
 def relu_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constexpr):
     """
     ReLU activation function kernel
