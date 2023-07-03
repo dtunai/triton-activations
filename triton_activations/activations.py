@@ -93,6 +93,13 @@ def silu_activation(x: torch.Tensor):
     return apply_activation(x, functions.silu_activation_kernel)
 
 
+def hard_silu_activation(x: torch.Tensor,):
+    """
+    Applies the hard SiLU activation function to element-wise to the input tensor
+    """
+    return apply_activation(x, functions.hard_silu_activation_kernel)
+
+
 def gelu_activation(x: torch.Tensor, approximate: bool = True):
     """
     Applies the Gaussian Error Linear Unit (GELU) activation function element-wise to the input tensor

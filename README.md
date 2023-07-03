@@ -52,6 +52,10 @@ Approximates the sigmoid function with a piecewise linear function. It speeds up
 
 Combines the sigmoid and linear activation functions. It multiplies the linear component by the sigmoid output, emphasizing or de-emphasizing the linear contribution based on the sigmoid value.
 
+#### **Hard SiLU Activation Function Kernel**
+
+Piecewise linear function that approximates the SiLU (sigmoid-weighted linear unit) activation function. It is designed to provide a non-linear activation while being computationally efficient.
+
 #### **Gaussian Error Linear Unit Activation Function Kernel**
 
 Applies a smooth approximation of the Gaussian cumulative distribution function to the input data. It introduces non-linearity while preserving certain properties of the Gaussian distribution.

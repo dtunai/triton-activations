@@ -30,6 +30,7 @@ activation_functions = {
     "Sigmoid": activations.sigmoid_activation,
     "Hard Sigmoid": activations.hard_sigmoid_activation,
     "SiLU": activations.silu_activation,
+    "Hard SiLU": activations.hard_silu_activation,
     "GeLU Approximate True": lambda x: activations.gelu_activation(x, approximate=True),
     "Softmax": lambda x: activations.softmax_activation(x, axis_ld=10),
 }

@@ -184,6 +184,26 @@ def silu_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constex
 
 
 @triton.jit
+def hard_silu_activation_kernel(x_ptr, output_ptr, n_elements, BLOCK_SIZE: tl.constexpr):
+    """
+    Hard SiLU activation function kernel
+
+    Computes the element-wise function: {hard\_silu}(x) = x \cdot \mathrm{hard\_sigmoid}(x)
+    """
+    pid = tl.program_id(axis=0)
+    block_start = pid * BLOCK_SIZE
+    offsets = block_start + tl.arange(0, BLOCK_SIZE)
+    mask = offsets < n_elements
+
+    x = tl.load(x_ptr + offsets, mask=mask)
+    x_plus_3 = x + 3.0
+    relu6_result = tl.libdevice.min(tl.libdevice.max(x_plus_3, 0), 6.0)
+    hard_sigmoid_output = relu6_result / 6.0
+    output = x * hard_sigmoid_output
+    tl.store(output_ptr + offsets, output, mask=mask)
+
+
+@triton.jit
 def gelu_activation_kernel(
     x_ptr, output_ptr, approximation, n_elements, BLOCK_SIZE: tl.constexpr
 ):
