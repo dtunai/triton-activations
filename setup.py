@@ -14,7 +14,7 @@ setup(
     description="A expanded collection of Neural Network activations and other functions for Triton Compiler",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author="simudt",
+    author="attophyd",
     author_email="attophyd@gmail.com",
     url="https://github.com/attophyd/triton_activations",
     packages=find_packages(),
