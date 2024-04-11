@@ -5,7 +5,7 @@ Expanded collection of Neural Network activation functions and other function ke
 ## Usage
 
 ```bash
-git clone github.com/attophyd/triton-activations
+git clone github.com/simudt/triton-activations
 cd triton-activations
 python3 setup.py install
 python3 examples.py
