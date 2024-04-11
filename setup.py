@@ -15,8 +15,8 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="simudt",
-    author_email="dogukanuraztuna@gmail.com",
-    url="https://github.com/simudt/triton_activations",
+    author_email="attophyd@gmail.com",
+    url="https://github.com/attophyd/triton_activations",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 1 - Alpha",
